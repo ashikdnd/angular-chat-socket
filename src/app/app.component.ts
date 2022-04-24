@@ -11,7 +11,11 @@ export class AppComponent implements OnInit{
 
   nameSet = false;
   name = '';
+  userMsg = '';
   users: any = [];
+  mySocketId = '';
+  messages: any = [];
+  searchKey = '';
 
   constructor(private zone: NgZone) {
   }
@@ -27,14 +31,32 @@ export class AppComponent implements OnInit{
         this.users = data;
       })
     })
+    socket.on('incomingMsg', (data) => {
+      this.zone.run(() => {
+        this.messages.push(data);
+      })
+    })
+    socket.on('myId', (data) => {
+      this.zone.run(() => {
+        this.mySocketId = data.socketId;
+      })
+    })
   }
 
   getName(e: any) {
-    console.log(e)
-    if (e.keyCode === 13) {
+    if (e.keyCode === 13) { // Detect Enter key on the keyboard
       if (this.name.trim().length > 3) {
         this.nameSet = true;
-        socket.emit('updateName', this.name.trim())
+        socket.emit('updateName', this.name.trim());
+      }
+    }
+  }
+
+  getMsg(e: any) {
+    if (e.keyCode === 13) { // Detect Enter key on the keyboard
+      if (this.userMsg.trim().length) {
+        socket.emit('sendMessage', this.userMsg.trim());
+        this.userMsg = '';
       }
     }
   }

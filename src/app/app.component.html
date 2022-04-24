@@ -5,29 +5,27 @@
       <div class="search">
         <mat-form-field fxFlex="auto"  appearance="standard">
           <mat-label>Search</mat-label>
-          <input autocomplete="off" type="text" matInput placeholder="...">
+          <input autocomplete="off" type="text" matInput placeholder="..." [(ngModel)]="searchKey">
         </mat-form-field>
       </div>
 
-      <div class="chat-item" fxLayout="row" *ngFor="let user of users">
+      <div class="chat-item" fxLayout="row" *ngFor="let user of users | userSearch: searchKey">
         <span class="avatar" fxLayoutAlign="center center">A</span>
         <div fxLayout="column" fxFlex="auto">
           <span>{{user.name}}</span>
-          <span class="dull-text">{{user.msg ? user.name : '...'}}</span>
+          <span class="dull-text last-seen">{{user.msg ? user.msg : '...'}}</span>
         </div>
-        <span class="dull-text">1:05 AM</span>
+        <span class="dull-text">{{user.time}}</span>
       </div>
     </div>
     <div fxFlex="50" class="right chat-box" fxLayout="column">
       <div class="msg-wrapper">
-        <div class="msg l-msg">
-          Hi. How are you? Where have you been?
-        </div>
-        <div class="msg r-msg">
-          Hi. How are you? Where have you been?
+        <div class="msg" [class.r-msg]="msg.socket == mySocketId" [class.l-msg]="msg.socket != mySocketId" *ngFor="let msg of messages">
+          {{msg.msg}}
         </div>
       </div>
-      <input autocomplete="off" type="text" id="composer" placeholder="Your message...">
+      <input [disabled]="!nameSet" (keyup)="getMsg($event)" [(ngModel)]="userMsg"
+             autocomplete="off" type="text" id="composer" placeholder="{{nameSet ? 'Your message...' : 'Update your name to write messages'}}">
     </div>
   </div>
 </div>
